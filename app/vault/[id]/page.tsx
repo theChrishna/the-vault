@@ -51,7 +51,8 @@ export default async function SingleCapsulePage({ params }: { params: { id: stri
   let userData: JwtPayload | string;
   try {
     userData = jwt.verify(token, jwtSecret);
-  } catch (error) {
+  } catch {
+    // FIX: Removed unused 'error' variable
     redirect('/login');
   }
 
@@ -67,7 +68,8 @@ export default async function SingleCapsulePage({ params }: { params: { id: stri
         <div className="flex min-h-screen items-center justify-center bg-[#F0F3FB] text-center p-4">
             <div>
                 <h1 className="text-2xl font-bold text-gray-800">Capsule Not Found</h1>
-                <p className="text-gray-600 mt-2">This capsule may not exist, isn't unlocked yet, or you don't have permission to view it.</p>
+                {/* FIX: Escaped single quotes with &apos; */}
+                <p className="text-gray-600 mt-2">This capsule may not exist, isn&apos;t unlocked yet, or you don&apos;t have permission to view it.</p>
                 <Link href="/vault" className="mt-6 inline-flex items-center text-blue-600 hover:underline">
                     <ArrowLeft size={16} className="mr-2" />
                     Back to The Vault
@@ -104,4 +106,3 @@ export default async function SingleCapsulePage({ params }: { params: { id: stri
     </div>
   );
 }
-

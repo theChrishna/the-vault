@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ArrowLeft, Loader2 } from 'lucide-react';
+import Link from 'next/link'; // Import Link from Next.js
 
 export default function CreateCapsulePage() {
   const [title, setTitle] = useState('');
@@ -42,7 +43,8 @@ export default function CreateCapsulePage() {
         // Capsule creation failed
         setError(data.message || 'Something went wrong.');
       }
-    } catch (err) {
+    } catch {
+      // FIX: Removed 'err' since it was unused
       setError('Failed to connect to the server.');
     } finally {
       setLoading(false);
@@ -55,10 +57,12 @@ export default function CreateCapsulePage() {
         <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <h1 className="text-2xl font-serif text-gray-800 font-bold">Create a New Capsule</h1>
-            <a href="/vault" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900">
+            
+            {/* FIX: Changed <a> to <Link> for client-side navigation */}
+            <Link href="/vault" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900">
               <ArrowLeft size={20} />
               <span>Back to Vault</span>
-            </a>
+            </Link>
           </div>
         </nav>
       </header>
@@ -76,7 +80,6 @@ export default function CreateCapsulePage() {
                   name="title"
                   type="text"
                   required
-                  // The only change is adding `text-gray-900` here
                   className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
                   placeholder="e.g., My Ambitions for 2030"
                   value={title}
@@ -95,7 +98,6 @@ export default function CreateCapsulePage() {
                   name="message"
                   rows={6}
                   required
-                  // The only change is adding `text-gray-900` here
                   className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
                   placeholder="Write down your goals, feelings, predictions..."
                   value={message}
@@ -115,7 +117,6 @@ export default function CreateCapsulePage() {
                   type="date"
                   required
                   min={getTodayString()}
-                  // The only change is adding `text-gray-900` here
                   className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
                   value={unlockDate}
                   onChange={(e) => setUnlockDate(e.target.value)}

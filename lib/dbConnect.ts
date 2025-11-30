@@ -1,8 +1,6 @@
 import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
-// FOR DEBUGGING ONLY:
-// const MONGODB_URI = "mongodb+srv://Chrishna_db_user:5Fig0vINl1638vsE@the-goal-time-capsule.cwpwavq.mongodb.net/?retryWrites=true&w=majority&appName=the-goal-time-capsule";
 
 if (!MONGODB_URI) {
   throw new Error(
@@ -10,15 +8,17 @@ if (!MONGODB_URI) {
   );
 }
 
-/**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections growing exponentially
- * during API Route usage.
- */
-let cached = (global as any).mongoose;
+// FIX 1: Define the interface so we don't use 'any'
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
+
+// FIX 2: Cast global to 'unknown' then to our type, avoiding the 'explicit-any' error
+let cached = (global as unknown as { mongoose: MongooseCache }).mongoose;
 
 if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+  cached = (global as unknown as { mongoose: MongooseCache }).mongoose = { conn: null, promise: null };
 }
 
 async function dbConnect() {
@@ -31,7 +31,6 @@ async function dbConnect() {
       bufferCommands: false,
     };
 
-    // The change is on this line: MONGODB_URI!
     cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
       return mongoose;
     });
