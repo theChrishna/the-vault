@@ -55,7 +55,8 @@ export default function VaultPage() {
         } else {
           setError(data.message || 'An error occurred while fetching capsules.');
         }
-      } catch (err) {
+      } catch {
+        // FIX: Removed 'err' since it was unused
         setError('Could not connect to the server. Please try again later.');
       } finally {
         setLoading(false);
@@ -81,38 +82,29 @@ export default function VaultPage() {
     }
   };
 
-  // UPDATED: Function to handle deleting a capsule
+  // Function to handle deleting a capsule
   const handleDelete = async (e: React.MouseEvent, capsuleId: string) => {
-    // Stop the click from navigating to the capsule page
     e.preventDefault();
     e.stopPropagation();
 
-    // Show a confirmation dialog before deleting
     const userConfirmed = confirm("Are you sure you want to delete this capsule? This action cannot be undone.");
 
     if (!userConfirmed) {
-      return; // Stop if the user clicks "Cancel"
+      return; 
     }
 
-    setIsDeleting(capsuleId); // Show loading spinner for this specific card
+    setIsDeleting(capsuleId); 
 
     try {
       const response = await fetch(`/api/capsules/${capsuleId}`, {
         method: 'DELETE',
       });
 
-      // --- KEY CHANGE IS HERE ---
-      // We are now *only* checking for `response.ok` (status 200).
-      // A 404 will now go to the `else` block, which is correct.
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data.message); // "Capsule deleted successfully."
-        // Remove the capsule from the state to update the UI instantly
+      if (response.ok || response.status === 404) {
         setCapsules((prevCapsules) =>
           prevCapsules.filter((capsule) => capsule._id !== capsuleId)
         );
       } else {
-        // Handle all errors (404, 403, 500, etc.)
         const data = await response.json();
         console.error("Failed to delete capsule:", data.message);
         alert("Failed to delete capsule: " + (data.message || "Please try again."));
@@ -121,7 +113,7 @@ export default function VaultPage() {
       console.error("Error connecting to server:", err);
       alert("An error occurred. Please check your connection and try again.");
     } finally {
-      setIsDeleting(null); // Hide loading spinner
+      setIsDeleting(null); 
     }
   };
 
@@ -171,47 +163,41 @@ export default function VaultPage() {
                         
                         if (isUnlocked) {
                             return (
-                                <Link href={`/vault/${capsule._id}`} key={capsule._id} className="block group">
-                                    {/* Made card a flex container to push delete button to the bottom */}
-                                    <div className="bg-white rounded-lg shadow p-6 h-full transition-all duration-300 border-2 border-green-400 group-hover:shadow-xl group-hover:-translate-y-1 cursor-pointer flex flex-col justify-between">
-                                        {/* Top section of the card */}
-                                        <div>
-                                          <div className="flex justify-between items-start">
-                                              <h3 className="text-xl font-bold text-black opacity-100 pr-2 truncate">{capsule.title}</h3>
-                                              <Unlock className="text-green-500 flex-shrink-0" />
-                                          </div>
-                                          <p className="text-sm text-gray-600 opacity-100 mt-2">
-                                              Unlocked on: {new Date(capsule.unlockDate).toLocaleDateString()}
-                                          </p>
-                                          <p className="text-sm font-semibold mt-4 inline-block px-3 py-1 rounded-full text-green-800 bg-green-200">
-                                              Ready to Open
-                                          </p>
+                                <div key={capsule._id} className="bg-white rounded-lg shadow h-full transition-all duration-300 border-2 border-green-400 flex flex-col justify-between">
+                                    <Link href={`/vault/${capsule._id}`} className="block group p-6 cursor-pointer hover:bg-green-50/50 rounded-t-lg">
+                                      <div>
+                                        <div className="flex justify-between items-start">
+                                            <h3 className="text-xl font-bold text-black opacity-100 pr-2 truncate">{capsule.title}</h3>
+                                            <Unlock className="text-green-500 flex-shrink-0" />
                                         </div>
+                                        <p className="text-sm text-gray-600 opacity-100 mt-2">
+                                            Unlocked on: {new Date(capsule.unlockDate).toLocaleDateString()}
+                                        </p>
+                                        <p className="text-sm font-semibold mt-4 inline-block px-3 py-1 rounded-full text-green-800 bg-green-200">
+                                            Ready to Open
+                                        </p>
+                                      </div>
+                                    </Link>
 
-                                        {/* NEW: Delete Button Area */}
-                                        <div className="mt-4 pt-4 border-t border-gray-100">
-                                          <button
-                                            // Pass event and ID to the handler
-                                            onClick={(e) => handleDelete(e, capsule._id)}
-                                            // Disable if *any* capsule is being deleted
-                                            disabled={!!isDeleting}
-                                            className="flex items-center justify-center w-full rounded-md px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                          >
-                                            {isDeleting === capsule._id ? (
-                                              <Loader2 className="h-5 w-5 animate-spin" />
-                                            ) : (
-                                              <>
-                                                <Trash2 size={16} className="mr-2" />
-                                                Delete Capsule
-                                              </>
-                                            )}
-                                          </button>
-                                        </div>
+                                    <div className="p-6 pt-4 border-t border-gray-100">
+                                      <button
+                                        onClick={(e) => handleDelete(e, capsule._id)}
+                                        disabled={!!isDeleting}
+                                        className="flex items-center justify-center w-full rounded-md px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                      >
+                                        {isDeleting === capsule._id ? (
+                                          <Loader2 className="h-5 w-5 animate-spin" />
+                                        ) : (
+                                          <>
+                                            <Trash2 size={16} className="mr-2" />
+                                            Delete Capsule
+                                          </>
+                                        )}
+                                      </button>
                                     </div>
-                                </Link>
+                                </div>
                             );
                         } else {
-                            // --- This is the LOCKED card (no changes) ---
                             return (
                                 <div key={capsule._id}>
                                      <div className="bg-white rounded-lg shadow p-6 h-full border border-gray-200 opacity-80">

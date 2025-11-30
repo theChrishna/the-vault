@@ -45,7 +45,8 @@ export default function RegisterPage() {
         // Registration failed
         setError(data.message || 'Something went wrong.');
       }
-    } catch (err) {
+    } catch {
+      // FIX: Removed 'err' since it was unused
       setError('Failed to connect to the server.');
     } finally {
       setLoading(false);

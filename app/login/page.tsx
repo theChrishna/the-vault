@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link'; // Import Link
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -33,15 +34,14 @@ export default function LoginPage() {
         setSuccess(true);
         // Redirect after a short delay to show the success state
         setTimeout(() => {
-            // For preview purposes, we use window.location.
-            // In a real Next.js app, useRouter would be used.
             window.location.href = '/vault'; 
         }, 1500);
       } else {
         // Login failed
         setError(data.message || 'Something went wrong.');
       }
-    } catch (err) {
+    } catch {
+      // FIX: Removed unused 'err' variable
       setError('Failed to connect to the server.');
     } finally {
       setLoading(false);
@@ -116,12 +116,12 @@ export default function LoginPage() {
 
         <p className="mt-2 text-center text-sm text-gray-600">
         don&apos;t have an account?{' '}
-          <a href="/register" className="font-medium text-gray-900 hover:text-gray-700 underline">
+          {/* FIX: Changed <a> to <Link> */}
+          <Link href="/register" className="font-medium text-gray-900 hover:text-gray-700 underline">
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
     </div>
   );
 }
-
