@@ -5,9 +5,12 @@ import dbConnect from '@/lib/dbConnect';
 import Capsule from '@/models/Capsule';
 import mongoose from 'mongoose';
 
-// Helper function to get authenticated user ID
-function getAuthUserId(): string | null {
-  const token = cookies().get('token')?.value;
+// Updated helper to be async for Next.js 15
+async function getAuthUserId(): Promise<string | null> {
+  // cookies() is now a Promise in Next.js 15
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
+  
   if (!token) {
     return null;
   }
@@ -26,13 +29,15 @@ function getAuthUserId(): string | null {
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> } // 1. Type is now a Promise
 ) {
   try {
     await dbConnect();
-    const userId = getAuthUserId();
+    
+    // 2. Await the authentication helper
+    const userId = await getAuthUserId();
 
-    // 1. Check for authentication
+    // Check for authentication
     if (!userId) {
       return NextResponse.json(
         { success: false, message: 'Unauthorized: No token provided.' },
@@ -40,9 +45,10 @@ export async function DELETE(
       );
     }
 
-    const capsuleId = params.id;
+    // 3. Await the params object
+    const { id: capsuleId } = await params;
 
-    // 2. Validate the Capsule ID
+    // Validate the Capsule ID
     if (!mongoose.Types.ObjectId.isValid(capsuleId)) {
       return NextResponse.json(
         { success: false, message: 'Invalid capsule ID format.' },
@@ -50,7 +56,7 @@ export async function DELETE(
       );
     }
 
-    // 3. Find the capsule to ensure it exists
+    // Find the capsule to ensure it exists
     const capsule = await Capsule.findById(capsuleId);
 
     if (!capsule) {
@@ -60,7 +66,7 @@ export async function DELETE(
       );
     }
 
-    // 4. Security Check: Ensure the user owns this capsule
+    // Security Check: Ensure the user owns this capsule
     if (capsule.user.toString() !== userId) {
       return NextResponse.json(
         { success: false, message: 'Forbidden: You do not own this capsule.' },
@@ -68,8 +74,7 @@ export async function DELETE(
       );
     }
     
-    // 5. Security Check: (Optional, based on your rule) Only allow deleting *unlocked* capsules
-    // If you want to allow deleting locked capsules too, you can remove this check.
+    // Security Check: Only allow deleting *unlocked* capsules
     if (new Date(capsule.unlockDate) > new Date()) {
        return NextResponse.json(
         { success: false, message: 'Forbidden: This capsule is still locked.' },
@@ -77,7 +82,7 @@ export async function DELETE(
       );
     }
 
-    // 6. Perform the delete operation
+    // Perform the delete operation
     await Capsule.findByIdAndDelete(capsuleId);
 
     return NextResponse.json(
