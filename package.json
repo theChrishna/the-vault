@@ -8,16 +8,16 @@
     "start": "next start",
     "lint": "eslint"
   },
-  "dependencies": {
+"dependencies": {
     "@types/jsonwebtoken": "^9.0.10",
     "bcryptjs": "^3.0.2",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.543.0",
     "mongoose": "^8.18.1",
-    "next": "15.5.2",
+    "next": "latest",
     "node-cron": "^4.2.1",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "resend": "^6.6.0"
   },
   "devDependencies": {
