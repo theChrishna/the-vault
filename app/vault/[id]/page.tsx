@@ -1,4 +1,4 @@
-// VERCEL UPDATE TRIGGER: Next.js 15 Fix
+// VERCEL UPDATE TRIGGER: Next.js 15 Fix (Cookies)
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import jwt, { JwtPayload } from 'jsonwebtoken';
@@ -41,7 +41,8 @@ export default async function SingleCapsulePage({
   const resolvedParams = await params;
   const { id } = resolvedParams;
 
-  const cookieStore = cookies();
+  // FIX: Await cookies() because it is async in Next.js 15
+  const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
   if (!token) {
