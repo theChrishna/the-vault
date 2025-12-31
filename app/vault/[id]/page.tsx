@@ -1,3 +1,4 @@
+// VERCEL UPDATE TRIGGER: Next.js 15 Fix
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import jwt, { JwtPayload } from 'jsonwebtoken';
@@ -30,10 +31,15 @@ async function getSingleCapsule(capsuleId: string, userId: string) {
   }
 }
 
-// This is the Server Component for the single capsule view page
-export default async function SingleCapsulePage({ params }: { params: { id: string } }) {
-  // FIX: Destructure `id` from `params` to satisfy Next.js static analysis.
-  const { id } = params;
+// FIX: Direct type definition for params (no interface)
+export default async function SingleCapsulePage({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> 
+}) {
+  // FIX: Await the params object before accessing properties
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
 
   const cookieStore = cookies();
   const token = cookieStore.get('token')?.value;
@@ -52,7 +58,6 @@ export default async function SingleCapsulePage({ params }: { params: { id: stri
   try {
     userData = jwt.verify(token, jwtSecret);
   } catch {
-    // FIX: Removed unused 'error' variable
     redirect('/login');
   }
 
@@ -60,7 +65,6 @@ export default async function SingleCapsulePage({ params }: { params: { id: stri
     redirect('/login');
   }
 
-  // FIX: Use the destructured `id` variable here.
   const capsule = await getSingleCapsule(id, userData.id);
 
   if (!capsule) {
@@ -68,7 +72,6 @@ export default async function SingleCapsulePage({ params }: { params: { id: stri
         <div className="flex min-h-screen items-center justify-center bg-[#F0F3FB] text-center p-4">
             <div>
                 <h1 className="text-2xl font-bold text-gray-800">Capsule Not Found</h1>
-                {/* FIX: Escaped single quotes with &apos; */}
                 <p className="text-gray-600 mt-2">This capsule may not exist, isn&apos;t unlocked yet, or you don&apos;t have permission to view it.</p>
                 <Link href="/vault" className="mt-6 inline-flex items-center text-blue-600 hover:underline">
                     <ArrowLeft size={16} className="mr-2" />
@@ -96,9 +99,7 @@ export default async function SingleCapsulePage({ params }: { params: { id: stri
                     <p>Unlocked on: {new Date(capsule.unlockDate).toLocaleDateString()}</p>
                 </div>
                 
-                {/* The 'prose' class provides nice formatting, but we'll style the text color directly. */}
                 <div className="prose max-w-none">
-                    {/* CHANGE: Applied text-black directly to the paragraph for a more forceful override. */}
                     <p className="text-black">{capsule.message}</p>
                 </div>
             </div>
