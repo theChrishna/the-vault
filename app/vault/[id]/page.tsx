@@ -18,7 +18,7 @@ async function getSingleCapsule(capsuleId: string, userId: string) {
 
     // FIX: Use .lean() to get a plain JavaScript object
     // This ensures we get all fields without Mongoose magic interfering
-    const capsule = await Capsule.findById(capsuleId).lean();
+    const capsule = await Capsule.findById(capsuleId).lean() as any;
 
     if (!capsule || capsule.user.toString() !== userId || new Date(capsule.unlockDate) > new Date()) {
       return null;
@@ -47,10 +47,10 @@ async function getSingleCapsule(capsuleId: string, userId: string) {
 }
 
 // FIX: Direct type definition for params (no interface)
-export default async function SingleCapsulePage({ 
-  params 
-}: { 
-  params: Promise<{ id: string }> 
+export default async function SingleCapsulePage({
+  params
+}: {
+  params: Promise<{ id: string }>
 }) {
   // FIX: Await the params object before accessing properties
   const resolvedParams = await params;
