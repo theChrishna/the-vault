@@ -1,34 +1,48 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import {
   ArrowRight, Rocket, Brain, Leaf, Lock, Mail, Hourglass,
   Eye, Archive, Github, Twitter, MessageSquare, CheckCircle
 } from 'lucide-react';
+import Image from 'next/image'; // Ensure this is imported
 
 export default function LandingPage() {
   return (
-    // Background: Light Grey (Light Mode) / Deep Charcoal (Dark Mode)
     <div className="min-h-screen bg-[#F0F3FB] dark:bg-background-dark text-gray-900 dark:text-text-main-dark transition-colors duration-300 relative overflow-x-hidden">
 
-      {/* Noise Texture Overlay (Optional - adds texture in dark mode) */}
+      {/* Noise Texture Overlay */}
       <div className="fixed inset-0 pointer-events-none z-0 bg-noise opacity-30 mix-blend-overlay"></div>
 
       {/* --- NAVIGATION --- */}
       <nav className="sticky top-0 z-50 w-full backdrop-blur-md bg-[#F0F3FB]/80 dark:bg-background-dark/80 border-b border-gray-200/50 dark:border-white/5">
         <div className="max-w-[1100px] mx-auto px-6 sm:px-8">
           <div className="flex justify-between items-center h-20">
-            {/* Logo Section */}
+
+            {/* --- LOGO SECTION --- */}
             <div className="flex items-center gap-3 cursor-pointer">
-              <div className="w-10 h-10 relative">  {/* Slightly adjusted size for image */}
+
+              {/* REPLACEMENT INSTRUCTIONS:
+                 1. Place 'logo-light.png' and 'logo-dark.png' in your 'public' folder.
+                 2. The classes below automatically show/hide the correct one.
+              */}
+              <div className="relative w-8 h-8">
+                {/* Light Mode Logo: Visible by default, hidden in dark mode */}
                 <Image
-                  src="/logo.png"
-                  alt="The Goal Time Capsule Logo"
+                  src="/logo-light.png"
+                  alt="Logo"
                   fill
-                  className="object-contain" // Ensures logo isn't stretched
-                  priority
+                  className="object-contain dark:hidden"
+                />
+
+                {/* Dark Mode Logo: Hidden by default, block (visible) in dark mode */}
+                <Image
+                  src="/logo-dark.png"
+                  alt="Logo"
+                  fill
+                  className="object-contain hidden dark:block"
                 />
               </div>
+
               <span className="font-serif font-medium text-lg tracking-tight text-gray-900 dark:text-white/90">
                 The Goal Time Capsule
               </span>
@@ -54,10 +68,11 @@ export default function LandingPage() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>
-          </div >
-        </div >
-      </nav >
+          </div>
+        </div>
+      </nav>
 
+      {/* ... Rest of the Landing Page content ... */}
       <main className="relative z-10">
         {/* --- HERO SECTION --- */}
         <section className="pt-24 pb-32 overflow-hidden">
@@ -390,6 +405,6 @@ export default function LandingPage() {
           </div>
         </footer>
       </main>
-    </div >
+    </div>
   );
 }
