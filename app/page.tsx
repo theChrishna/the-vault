@@ -244,7 +244,7 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row items-center gap-20">
               <div className="md:w-1/2">
                 <span className="inline-block py-1 px-3 rounded-full text-[10px] font-bold tracking-widest text-primary border border-primary/20 uppercase mb-6">Growth</span>
-                <h2 className="font-serif text-4xl md:text-5xl font-medium mb-6 text-gray-900 dark:text-text-main-dark leading-tight">The beauty of the <span class="italic text-primary">unread</span> letter.</h2>
+                <h2 className="font-serif text-4xl md:text-5xl font-medium mb-6 text-gray-900 dark:text-text-main-dark leading-tight">The beauty of the <span className="italic text-primary">unread</span> letter.</h2>
                 <p className="text-lg text-gray-600 dark:text-text-muted-dark mb-8 leading-relaxed font-light">
                   There is a unique magic in forgetting what you wrote, only to be reminded of your past self&apos;s wisdom. It’s like receiving advice from an old friend who knows you better than anyone else.
                 </p>
