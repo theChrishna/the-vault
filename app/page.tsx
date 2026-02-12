@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
+import Image from 'next/image';
 import {
   ArrowRight, Rocket, Brain, Leaf, Lock, Mail, Hourglass,
   Eye, Archive, Github, Twitter, MessageSquare, CheckCircle
 } from 'lucide-react';
-import Image from 'next/image'; // Ensure this is imported
 
 export default function LandingPage() {
   return (
@@ -21,22 +21,18 @@ export default function LandingPage() {
             {/* --- LOGO SECTION --- */}
             <div className="flex items-center gap-3 cursor-pointer">
 
-              {/* REPLACEMENT INSTRUCTIONS:
-                 1. Place 'logo-light.png' and 'logo-dark.png' in your 'public' folder.
-                 2. The classes below automatically show/hide the correct one.
-              */}
               <div className="relative w-8 h-8">
-                {/* Light Mode Logo: Visible by default, hidden in dark mode */}
+                {/* Light Mode Logo */}
                 <Image
-                  src="/logo-light.png"
+                  src="/logo-light.svg"
                   alt="Logo"
                   fill
                   className="object-contain dark:hidden"
                 />
 
-                {/* Dark Mode Logo: Hidden by default, block (visible) in dark mode */}
+                {/* Dark Mode Logo */}
                 <Image
-                  src="/logo-dark.png"
+                  src="/logo-dark.svg"
                   alt="Logo"
                   fill
                   className="object-contain hidden dark:block"
@@ -72,7 +68,6 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* ... Rest of the Landing Page content ... */}
       <main className="relative z-10">
         {/* --- HERO SECTION --- */}
         <section className="pt-24 pb-32 overflow-hidden">
