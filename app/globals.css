@@ -22,4 +22,10 @@
   body {
     @apply bg-white dark:bg-[#121212] text-gray-900 dark:text-[#f0f0f0] transition-colors duration-300;
   }
+
+  /* Global fix for inputs to prevent dark mode issues */
+  input,
+  textarea {
+    @apply bg-white text-gray-900 border-gray-300 placeholder-gray-500;
+  }
 }
