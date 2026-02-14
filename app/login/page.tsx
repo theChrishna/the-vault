@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -41,15 +42,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F0F3FB]">
+    <div className="flex min-h-screen items-center justify-center bg-[#F0F3FB] dark:bg-background-dark transition-colors duration-300">
+      {/* Theme Toggle - Fixed Position */}
+      <div className="fixed top-6 right-6 z-50">
+        <ThemeToggle />
+      </div>
+
       <div className="w-full max-w-md p-8 space-y-8">
         <div className="text-center">
-          <div className="inline-block mb-4 text-red-500">
+          <div className="inline-block mb-4 text-red-500 dark:text-primary">
             <svg width="60" height="40" viewBox="0 0 76 51" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M26.2162 50.1333L0 23.9171L6.30631 17.6108L26.2162 37.5207L69.6937 4.04321L76 10.3495L26.2162 50.1333Z" fill="#F43F5E" />
+              <path d="M26.2162 50.1333L0 23.9171L6.30631 17.6108L26.2162 37.5207L69.6937 4.04321L76 10.3495L26.2162 50.1333Z" fill="currentColor" />
             </svg>
           </div>
-          <h1 className="text-4xl font-serif text-gray-800">
+          <h1 className="text-4xl font-serif text-gray-800 dark:text-text-main-dark">
             Sign In to <span className="font-bold">Your Account</span>
           </h1>
         </div>
@@ -63,7 +69,7 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 required
-                className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm bg-white"
+                className="relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-white/20 px-3 py-3 text-gray-900 dark:text-text-main-dark placeholder-gray-500 dark:placeholder-text-muted-dark focus:z-10 focus:border-gray-500 dark:focus:border-white/40 focus:outline-none focus:ring-gray-500 dark:focus:ring-white/40 sm:text-sm bg-white dark:bg-surface-dark transition-colors"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -76,7 +82,7 @@ export default function LoginPage() {
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 required
-                className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-3 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm bg-white"
+                className="relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-white/20 px-3 py-3 text-gray-900 dark:text-text-main-dark placeholder-gray-500 dark:placeholder-text-muted-dark focus:z-10 focus:border-gray-500 dark:focus:border-white/40 focus:outline-none focus:ring-gray-500 dark:focus:ring-white/40 sm:text-sm bg-white dark:bg-surface-dark transition-colors"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -86,18 +92,18 @@ export default function LoginPage() {
                 className="absolute inset-y-0 right-0 flex items-center pr-3"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
+                {showPassword ? <EyeOff className="h-5 w-5 text-gray-400 dark:text-text-muted-dark" /> : <Eye className="h-5 w-5 text-gray-400 dark:text-text-muted-dark" />}
               </button>
             </div>
           </div>
 
-          {error && <p className="text-sm text-red-600 text-center pt-2">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400 text-center pt-2">{error}</p>}
 
           <div className="pt-2 space-y-3">
             <button
               type="submit"
               disabled={loading || success}
-              className="group relative flex w-full justify-center rounded-lg border border-transparent bg-black py-3 px-4 text-sm font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:bg-gray-500 disabled:cursor-not-allowed"
+              className="group relative flex w-full justify-center rounded-lg border border-transparent bg-black dark:bg-white py-3 px-4 text-sm font-medium text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-white/40 focus:ring-offset-2 disabled:bg-gray-500 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? 'Signing In...' : success ? 'Success!' : 'Sign In'}
             </button>
@@ -105,7 +111,7 @@ export default function LoginPage() {
             {/* --- GOOGLE LOGIN BUTTON --- */}
             <a
               href="/api/auth/google"
-              className="flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white py-3 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+              className="flex w-full items-center justify-center rounded-lg border border-gray-300 dark:border-white/20 bg-white dark:bg-surface-dark py-3 px-4 text-sm font-medium text-gray-700 dark:text-text-main-dark hover:bg-gray-50 dark:hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-white/40 focus:ring-offset-2 transition-colors"
             >
               <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                 <path
@@ -130,9 +136,9 @@ export default function LoginPage() {
           </div>
         </form>
 
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-gray-600 dark:text-text-muted-dark">
           don&apos;t have an account?{' '}
-          <Link href="/register" className="font-medium text-gray-900 hover:text-gray-700 underline">
+          <Link href="/register" className="font-medium text-gray-900 dark:text-text-main-dark hover:text-gray-700 dark:hover:text-white underline">
             Sign up
           </Link>
         </p>
