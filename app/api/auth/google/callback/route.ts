@@ -15,25 +15,24 @@ export async function GET(request: Request) {
   // 2. Parse Query Params
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
-  
+
   if (!code) {
     return NextResponse.json({ error: "No code provided from Google" }, { status: 400 });
   }
 
-  // --- HARDCODED TEST MODE ---
-  // If your .env variables aren't loading, paste your real keys inside the quotes here to test.
-  // Example: const clientId = "12345...apps.googleusercontent.com";
-  const clientId = process.env.GOOGLE_CLIENT_ID || "PASTE_YOUR_CLIENT_ID_HERE";
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET || "PASTE_YOUR_CLIENT_SECRET_HERE";
-  
+  // --- Environment Variable Configuration ---
+  // Credentials are loaded from environment variables
+  const clientId = process.env.GOOGLE_CLIENT_ID || "";
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET || "";
+
   console.log("--- DEBUG CREDENTIALS ---");
   console.log("Client ID being used:", clientId);
-  console.log("Client Secret status:", clientSecret && clientSecret !== "PASTE_YOUR_CLIENT_SECRET_HERE" ? "EXISTS" : "MISSING/PLACEHOLDER");
-  
+  console.log("Client Secret status:", clientSecret ? "EXISTS" : "MISSING");
+
   // Safety check to prevent crashing if keys are missing
-  if (!clientId || clientId === "PASTE_YOUR_CLIENT_ID_HERE" || !clientSecret || clientSecret === "PASTE_YOUR_CLIENT_SECRET_HERE") {
-      console.error("CRITICAL: Google OAuth credentials are missing or not configured.");
-      return NextResponse.json({ error: "Server Configuration Error: Missing Google Credentials" }, { status: 500 });
+  if (!clientId || !clientSecret) {
+    console.error("CRITICAL: OAuth credentials are missing or not configured.");
+    return NextResponse.json({ error: "Server Configuration Error: Missing Credentials" }, { status: 500 });
   }
   // --- DEBUGGING END ---
 
@@ -52,10 +51,10 @@ export async function GET(request: Request) {
     });
 
     const tokenData = await tokenResponse.json();
-    
+
     if (!tokenResponse.ok) {
-        console.error("Google Token Error:", tokenData);
-        return NextResponse.json({ error: "Failed to exchange code", details: tokenData }, { status: 400 });
+      console.error("Google Token Error:", tokenData);
+      return NextResponse.json({ error: "Failed to exchange code", details: tokenData }, { status: 400 });
     }
 
     // 4. Get User Profile
@@ -73,16 +72,16 @@ export async function GET(request: Request) {
       user = await User.create({
         name: googleUser.name,
         email: googleUser.email,
-        password: randomPassword, 
+        password: randomPassword,
         isVerified: true,
         verifyToken: undefined,
       });
     } else {
-        // Existing User: Ensure verified
-        if (!user.isVerified) {
-            user.isVerified = true;
-            await user.save();
-        }
+      // Existing User: Ensure verified
+      if (!user.isVerified) {
+        user.isVerified = true;
+        await user.save();
+      }
     }
 
     // 6. Generate Session Token
@@ -98,11 +97,11 @@ export async function GET(request: Request) {
 
     // 7. Set Cookie and Redirect
     const response = NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/vault`);
-    
+
     response.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24, 
+      maxAge: 60 * 60 * 24,
       path: "/",
     });
 
