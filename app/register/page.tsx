@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function RegisterPage() {
@@ -63,11 +64,21 @@ export default function RegisterPage() {
 
       <div className="w-full max-w-md p-8 space-y-8">
         <div className="text-center">
-          {/* You can replace this with your actual logo component or SVG */}
-          <div className="inline-block mb-4 text-red-500 dark:text-primary">
-            <svg width="60" height="40" viewBox="0 0 76 51" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M26.2162 50.1333L0 23.9171L6.30631 17.6108L26.2162 37.5207L69.6937 4.04321L76 10.3495L26.2162 50.1333Z" fill="currentColor" />
-            </svg>
+          <div className="relative inline-block mb-4 w-16 h-16">
+            {/* Light Mode Logo */}
+            <Image
+              src="/logo-light.svg"
+              alt="Logo"
+              fill
+              className="object-contain dark:hidden"
+            />
+            {/* Dark Mode Logo */}
+            <Image
+              src="/logo-dark.svg"
+              alt="Logo"
+              fill
+              className="object-contain hidden dark:block"
+            />
           </div>
           <h1 className="text-4xl font-serif text-gray-800 dark:text-text-main-dark">
             Create <span className="font-bold">Account</span>

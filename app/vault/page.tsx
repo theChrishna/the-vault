@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 // Import Trash2 for the delete button
 import { PlusCircle, LogOut, Loader2, Lock, Unlock, Trash2 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -123,7 +124,25 @@ export default function VaultPage() {
       <header className="bg-white dark:bg-surface-dark shadow-sm border-b border-gray-200 dark:border-white/10">
         <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-serif text-gray-800 dark:text-text-main-dark font-bold">The Vault</h1>
+            <div className="flex items-center gap-3">
+              <div className="relative w-8 h-8">
+                {/* Light Mode Logo */}
+                <Image
+                  src="/logo-light.svg"
+                  alt="Logo"
+                  fill
+                  className="object-contain dark:hidden"
+                />
+                {/* Dark Mode Logo */}
+                <Image
+                  src="/logo-dark.svg"
+                  alt="Logo"
+                  fill
+                  className="object-contain hidden dark:block"
+                />
+              </div>
+              <h1 className="text-2xl font-serif text-gray-800 dark:text-text-main-dark font-bold">The Vault</h1>
+            </div>
             <div className="flex items-center gap-4">
               <ThemeToggle />
               <button
