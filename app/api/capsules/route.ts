@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import dbConnect from '@/lib/dbConnect';
 import Capsule from '@/models/Capsule';
+import { encrypt, decrypt } from '@/lib/encryption';
 
 // Helper function to get authenticated user ID
 // FIX: Made async because cookies() is async in Next.js 15
@@ -38,15 +39,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Missing required fields' }, { status: 400 });
     }
 
+    // Encrypt sensitive data before storing
+    const encryptedTitle = encrypt(title, userId);
+    const encryptedMessage = encrypt(message, userId);
+    const encryptedAttachment = attachment ? encrypt(attachment, userId) : undefined;
+
     const newCapsule = await Capsule.create({
       user: userId,
-      title,
-      message,
+      title: encryptedTitle,
+      message: encryptedMessage,
       unlockDate,
-      // Save the new fields if they exist
-      attachment,
+      // Save encrypted attachment if it exists
+      attachment: encryptedAttachment,
       attachmentName,
-      attachmentType
+      attachmentType,
+      isEncrypted: true,
     });
 
     return NextResponse.json({ success: true, data: newCapsule }, { status: 201 });
@@ -56,6 +63,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
   }
 }
+
 
 export async function GET(request: Request) {
   try {
@@ -67,11 +75,46 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
+    console.log('[Capsule List] Fetching capsules for userId:', userId);
+
     // Only return fields needed for the vault view 
     // We explicitly exclude '-attachment' to keep the payload small and fast
     const capsules = await Capsule.find({ user: userId }).select('-attachment');
 
-    return NextResponse.json({ success: true, data: capsules }, { status: 200 });
+    // Decrypt the capsules data
+    const decryptedCapsules = capsules.map(capsule => {
+      const capsuleObj = capsule.toObject();
+
+      console.log(`[Capsule ${capsuleObj._id}] isEncrypted: ${capsuleObj.isEncrypted}, title preview: ${capsuleObj.title?.substring(0, 30)}...`);
+
+      // Only decrypt if the capsule is marked as encrypted AND the data actually looks encrypted
+      if (capsuleObj.isEncrypted) {
+        // Check if the title actually looks encrypted (has the format iv:authTag:data)
+        const titleLooksEncrypted = capsuleObj.title && capsuleObj.title.split(':').length === 3;
+        const messageLooksEncrypted = capsuleObj.message && capsuleObj.message.split(':').length === 3;
+
+        if (titleLooksEncrypted && messageLooksEncrypted) {
+          try {
+            capsuleObj.title = decrypt(capsuleObj.title, userId);
+            capsuleObj.message = decrypt(capsuleObj.message, userId);
+            console.log(`[Capsule ${capsuleObj._id}] ✓ Decryption successful`);
+          } catch (error) {
+            console.error(`[Capsule ${capsuleObj._id}] ✗ Decryption failed:`, error);
+            // If decrypt fails, mark it but don't crash
+            capsuleObj.title = '[Decryption Error]';
+            capsuleObj.message = '[Unable to decrypt]';
+          }
+        } else {
+          // Data is marked as encrypted but doesn't look encrypted - it's legacy data
+          console.log(`[Capsule ${capsuleObj._id}] ⚠ Marked encrypted but data is plaintext (legacy capsule)`);
+          // Leave the data as-is (it's already plaintext)
+        }
+      }
+
+      return capsuleObj;
+    });
+
+    return NextResponse.json({ success: true, data: decryptedCapsules }, { status: 200 });
 
   } catch (error) {
     console.error('Error fetching capsules:', error);

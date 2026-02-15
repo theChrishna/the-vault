@@ -57,8 +57,16 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#F0F3FB] dark:bg-background-dark transition-colors duration-300">
-      {/* Theme Toggle - Fixed Position */}
-      <div className="fixed top-6 right-6 z-50">
+      {/* Theme Toggle & Feedback - Fixed Position */}
+      <div className="fixed top-6 right-6 z-50 flex items-center gap-4">
+        <a
+          href={process.env.NEXT_PUBLIC_GOOGLE_FEEDBACK_FORM}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium text-gray-600 dark:text-text-muted-dark hover:text-black dark:hover:text-white transition-colors"
+        >
+          Feedback
+        </a>
         <ThemeToggle />
       </div>
 

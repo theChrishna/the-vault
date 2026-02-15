@@ -144,6 +144,14 @@ export default function VaultPage() {
               <h1 className="text-2xl font-serif text-gray-800 dark:text-text-main-dark font-bold">The Vault</h1>
             </div>
             <div className="flex items-center gap-4">
+              <a
+                href={process.env.NEXT_PUBLIC_GOOGLE_FEEDBACK_FORM}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:block text-sm font-medium text-gray-600 dark:text-text-muted-dark hover:text-black dark:hover:text-white transition-colors"
+              >
+                Feedback
+              </a>
               <ThemeToggle />
               <button
                 onClick={handleLogout}

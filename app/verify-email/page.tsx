@@ -4,12 +4,13 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const router = useRouter();
-  
+
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Verifying your email...');
 
@@ -50,9 +51,22 @@ function VerifyEmailContent() {
   }, [token, router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F0F3FB] p-4">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow text-center">
-        
+    <div className="flex min-h-screen items-center justify-center bg-[#F0F3FB] dark:bg-background-dark transition-colors duration-300 p-4">
+      {/* Theme Toggle & Feedback - Fixed Position */}
+      <div className="fixed top-6 right-6 z-50 flex items-center gap-4">
+        <a
+          href={process.env.NEXT_PUBLIC_GOOGLE_FEEDBACK_FORM}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium text-gray-600 dark:text-text-muted-dark hover:text-black dark:hover:text-white transition-colors"
+        >
+          Feedback
+        </a>
+        <ThemeToggle />
+      </div>
+
+      <div className="w-full max-w-md p-8 bg-white dark:bg-surface-dark rounded-lg shadow text-center">
+
         {/* LOADING STATE */}
         {status === 'loading' && (
           <div className="flex flex-col items-center space-y-4">

@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import Link from 'next/link';
 import { ArrowLeft, Download, FileText } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { decrypt } from '@/lib/encryption';
 
 async function getSingleCapsule(capsuleId: string, userId: string) {
   try {
@@ -31,6 +32,31 @@ async function getSingleCapsule(capsuleId: string, userId: string) {
     // This tells us if the data is actually in the database
     console.log("Debug View: Has Attachment Data:", !!capsule.attachment ? "YES" : "NO");
     // ---------------------------------------------------------------------
+
+    // Decrypt data if capsule is encrypted
+    if (capsule.isEncrypted) {
+      // Check if data actually looks encrypted before attempting decryption
+      const titleLooksEncrypted = capsule.title && capsule.title.split(':').length === 3;
+      const messageLooksEncrypted = capsule.message && capsule.message.split(':').length === 3;
+
+      if (titleLooksEncrypted && messageLooksEncrypted) {
+        try {
+          capsule.title = decrypt(capsule.title, userId);
+          capsule.message = decrypt(capsule.message, userId);
+          if (capsule.attachment && capsule.attachment.split(':').length === 3) {
+            capsule.attachment = decrypt(capsule.attachment, userId);
+          }
+        } catch (error) {
+          console.error("Error decrypting capsule:", error);
+          // Return null if decryption fails to prevent showing corrupted data
+          return null;
+        }
+      } else {
+        // Data is marked as encrypted but doesn't look encrypted - it's legacy data
+        console.log(`Legacy capsule ${capsuleId}: Marked encrypted but data is plaintext`);
+        // Leave the data as-is (it's already plaintext)
+      }
+    }
 
     // Convert Date objects and ID to strings for Next.js serialization
     return {

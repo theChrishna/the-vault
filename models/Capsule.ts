@@ -29,6 +29,16 @@ const CapsuleSchema = new mongoose.Schema({
   attachmentType: {
     type: String, // e.g., "image/jpeg"
   },
+  // Track whether this capsule's data is encrypted
+  isEncrypted: {
+    type: Boolean,
+    default: true, // New capsules will be encrypted by default
+  },
+  // Track if unlock email has been sent
+  isEmailSent: {
+    type: Boolean,
+    default: false,
+  },
 }, { timestamps: true });
 
 export default mongoose.models.Capsule || mongoose.model('Capsule', CapsuleSchema);

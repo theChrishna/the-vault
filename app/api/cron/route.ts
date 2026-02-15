@@ -3,6 +3,7 @@ import dbConnect from '@/lib/dbConnect';
 import Capsule from '@/models/Capsule';
 import User from '@/models/User'; // Required for populating user details
 import nodemailer from 'nodemailer';
+import { decrypt } from '@/lib/encryption';
 
 // Mark as dynamic so Vercel doesn't cache the result
 export const dynamic = 'force-dynamic';
@@ -22,25 +23,16 @@ export async function GET(request: Request) {
 
     await dbConnect();
 
-    // 2. Calculate "Today" (00:00 to 23:59)
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
-
     console.log(`--- CRON JOB START ---`);
-    console.log(`Looking for capsules unlocking between:`);
-    console.log(`Start: ${startOfDay.toISOString()}`);
-    console.log(`End:   ${endOfDay.toISOString()}`);
+    console.log(`Checking for unlocked capsules...`);
 
     // 3. Query the Database
-    // FIX: We explicitly pass the 'User' model here to avoid MissingSchemaError
+    // Finds capsules where:
+    // - unlockDate is in the past (<= now)
+    // - isEmailSent is NOT true (false or undefined)
     const capsulesToUnlock = await Capsule.find({
-      unlockDate: {
-        $gte: startOfDay,
-        $lte: endOfDay
-      }
+      unlockDate: { $lte: new Date() },
+      isEmailSent: { $ne: true }
     }).populate({ path: 'user', model: User });
 
     console.log(`Found ${capsulesToUnlock.length} capsules.`);
@@ -66,6 +58,19 @@ export async function GET(request: Request) {
 
       if (userEmail) {
         try {
+          // Decrypt the capsule title if it's encrypted
+          let capsuleTitle = capsule.title;
+          const userId = typeof capsule.user === 'object' ? (capsule.user as any)._id.toString() : capsule.user.toString();
+
+          if (capsule.isEncrypted && capsuleTitle && capsuleTitle.split(':').length === 3) {
+            try {
+              capsuleTitle = decrypt(capsuleTitle, userId);
+            } catch (decryptError) {
+              console.error(`Failed to decrypt title for capsule ${capsule._id}:`, decryptError);
+              capsuleTitle = 'Your Time Capsule'; // Fallback title
+            }
+          }
+
           // Fallback to localhost if env var is missing during dev
           const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
           const unlockUrl = `${baseUrl}/vault/${capsule._id}`;
@@ -81,7 +86,7 @@ export async function GET(request: Request) {
                 <h2>Hello ${userName},</h2>
                 <p>A message from your past self is ready to be unveiled.</p>
                 <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                  <h3 style="margin-top: 0;">${capsule.title}</h3>
+                  <h3 style="margin-top: 0;">${capsuleTitle}</h3>
                   <p style="color: #666; font-size: 14px;">Sealed on ${new Date(capsule.createdAt).toLocaleDateString()}</p>
                 </div>
                 <p>Click the button below to read your message:</p>
@@ -92,6 +97,10 @@ export async function GET(request: Request) {
               </div>
             `,
           });
+
+          // Mark as sent to prevent duplicates
+          capsule.isEmailSent = true;
+          await capsule.save();
 
           return { id: capsule._id, status: 'sent' };
         } catch (err) {

@@ -53,6 +53,14 @@ export default function LandingPage() {
             {/* Actions */}
             <div className="flex items-center gap-4">
               <ThemeToggle />
+              <a
+                href={process.env.NEXT_PUBLIC_GOOGLE_FEEDBACK_FORM}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:block text-sm font-medium text-gray-600 dark:text-text-muted-dark hover:text-black dark:hover:text-white transition-colors"
+              >
+                Feedback
+              </a>
               <Link href="/login" className="hidden sm:block text-sm font-medium text-gray-600 dark:text-text-muted-dark hover:text-black dark:hover:text-white transition-colors">
                 Sign In
               </Link>
