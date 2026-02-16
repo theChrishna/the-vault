@@ -40,7 +40,7 @@ export default function LandingPage() {
               </div>
 
               <span className="font-serif font-medium text-lg tracking-tight text-gray-900 dark:text-white/90">
-                The Goal Time Capsule
+                The Goal Time Capsule <span className="text-xs text-primary font-sans">v2</span>
               </span>
             </div>
 
@@ -57,7 +57,7 @@ export default function LandingPage() {
                 href={process.env.NEXT_PUBLIC_GOOGLE_FEEDBACK_FORM}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden sm:block text-sm font-medium text-gray-600 dark:text-text-muted-dark hover:text-black dark:hover:text-white transition-colors"
+                className="text-sm font-medium text-gray-600 dark:text-text-muted-dark hover:text-black dark:hover:text-white transition-colors"
               >
                 Feedback
               </a>
