@@ -87,28 +87,30 @@ export async function GET(request: Request) {
 
       console.log(`[Capsule ${capsuleObj._id}] isEncrypted: ${capsuleObj.isEncrypted}, title preview: ${capsuleObj.title?.substring(0, 30)}...`);
 
-      // Only decrypt if the capsule is marked as encrypted AND the data actually looks encrypted
       if (capsuleObj.isEncrypted) {
-        // Check if the title actually looks encrypted (has the format iv:authTag:data)
-        const titleLooksEncrypted = capsuleObj.title && capsuleObj.title.split(':').length === 3;
-        const messageLooksEncrypted = capsuleObj.message && capsuleObj.message.split(':').length === 3;
-
-        if (titleLooksEncrypted && messageLooksEncrypted) {
+        // Check and decrypt TITLE
+        const titleLooksEncrypted = capsuleObj.title && typeof capsuleObj.title === 'string' && capsuleObj.title.split(':').length === 3;
+        if (titleLooksEncrypted) {
           try {
             capsuleObj.title = decrypt(capsuleObj.title, userId);
-            capsuleObj.message = decrypt(capsuleObj.message, userId);
-            console.log(`[Capsule ${capsuleObj._id}] ✓ Decryption successful`);
           } catch (error) {
-            console.error(`[Capsule ${capsuleObj._id}] ✗ Decryption failed:`, error);
-            // If decrypt fails, mark it but don't crash
-            capsuleObj.title = '[Decryption Error]';
-            capsuleObj.message = '[Unable to decrypt]';
+            console.error(`[Capsule ${capsuleObj._id}] ✗ Title decryption failed:`, error);
+            capsuleObj.title = '[Encrypted Title]';
           }
-        } else {
-          // Data is marked as encrypted but doesn't look encrypted - it's legacy data
-          console.log(`[Capsule ${capsuleObj._id}] ⚠ Marked encrypted but data is plaintext (legacy capsule)`);
-          // Leave the data as-is (it's already plaintext)
         }
+
+        // Check and decrypt MESSAGE
+        const messageLooksEncrypted = capsuleObj.message && typeof capsuleObj.message === 'string' && capsuleObj.message.split(':').length === 3;
+        if (messageLooksEncrypted) {
+          try {
+            capsuleObj.message = decrypt(capsuleObj.message, userId);
+          } catch (error) {
+            console.error(`[Capsule ${capsuleObj._id}] ✗ Message decryption failed:`, error);
+            capsuleObj.message = '[Encrypted Message]';
+          }
+        }
+
+        console.log(`[Capsule ${capsuleObj._id}] Processed. Title: ${capsuleObj.title ? 'OK/Plain' : 'Missing'}, Message: ${capsuleObj.message ? 'OK/Plain' : 'Missing'}`);
       }
 
       return capsuleObj;

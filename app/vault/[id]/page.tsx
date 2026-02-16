@@ -35,27 +35,44 @@ async function getSingleCapsule(capsuleId: string, userId: string) {
 
     // Decrypt data if capsule is encrypted
     if (capsule.isEncrypted) {
-      // Check if data actually looks encrypted before attempting decryption
-      const titleLooksEncrypted = capsule.title && capsule.title.split(':').length === 3;
-      const messageLooksEncrypted = capsule.message && capsule.message.split(':').length === 3;
-
-      if (titleLooksEncrypted && messageLooksEncrypted) {
+      // Check and decrypt TITLE
+      const titleLooksEncrypted = capsule.title && typeof capsule.title === 'string' && capsule.title.split(':').length === 3;
+      if (titleLooksEncrypted) {
         try {
           capsule.title = decrypt(capsule.title, userId);
-          capsule.message = decrypt(capsule.message, userId);
-          if (capsule.attachment && capsule.attachment.split(':').length === 3) {
-            capsule.attachment = decrypt(capsule.attachment, userId);
-          }
         } catch (error) {
-          console.error("Error decrypting capsule:", error);
-          // Return null if decryption fails to prevent showing corrupted data
-          return null;
+          console.error(`[Capsule ${capsuleId}] ✗ Title decryption failed:`, error);
+          capsule.title = '[Encrypted Title]';
         }
-      } else {
-        // Data is marked as encrypted but doesn't look encrypted - it's legacy data
-        console.log(`Legacy capsule ${capsuleId}: Marked encrypted but data is plaintext`);
-        // Leave the data as-is (it's already plaintext)
       }
+
+      // Check and decrypt MESSAGE
+      const messageLooksEncrypted = capsule.message && typeof capsule.message === 'string' && capsule.message.split(':').length === 3;
+      if (messageLooksEncrypted) {
+        try {
+          capsule.message = decrypt(capsule.message, userId);
+        } catch (error) {
+          console.error(`[Capsule ${capsuleId}] ✗ Message decryption failed:`, error);
+          capsule.message = '[Encrypted Message]';
+        }
+      }
+
+      // Check and decrypt ATTACHMENT
+      // Only check attachment if it exists and is a string
+      if (capsule.attachment && typeof capsule.attachment === 'string') {
+        const attachmentLooksEncrypted = capsule.attachment.split(':').length === 3;
+        if (attachmentLooksEncrypted) {
+          try {
+            capsule.attachment = decrypt(capsule.attachment, userId);
+          } catch (error) {
+            console.error(`[Capsule ${capsuleId}] ✗ Attachment decryption failed:`, error);
+            // Don't show broken attachment data
+            capsule.attachment = null;
+          }
+        }
+      }
+
+      console.log(`[Capsule ${capsuleId}] Decryption attempt complete.`);
     }
 
     // Convert Date objects and ID to strings for Next.js serialization
