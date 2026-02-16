@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 // Import Trash2 for the delete button
-import { PlusCircle, LogOut, Loader2, Lock, Unlock, Trash2 } from 'lucide-react';
+import { PlusCircle, LogOut, Loader2, Lock, Unlock, Trash2, MessageSquare } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 // Define a type for our capsule data for better type safety
@@ -148,9 +148,11 @@ export default function VaultPage() {
                 href={process.env.NEXT_PUBLIC_GOOGLE_FEEDBACK_FORM}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-medium text-gray-600 dark:text-text-muted-dark hover:text-black dark:hover:text-white transition-colors"
+                className="text-sm font-medium text-gray-600 dark:text-text-muted-dark hover:text-black dark:hover:text-white transition-colors flex items-center gap-2"
+                aria-label="Feedback"
               >
-                Feedback
+                <MessageSquare size={18} />
+                <span className="hidden md:inline">Feedback</span>
               </a>
               <ThemeToggle />
               <button
