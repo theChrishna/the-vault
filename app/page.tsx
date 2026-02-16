@@ -40,7 +40,7 @@ export default function LandingPage() {
               </div>
 
               <span className="font-serif font-medium text-lg tracking-tight text-gray-900 dark:text-white/90">
-                The Goal Time Capsule <span className="text-xs text-primary font-sans">v3.0</span>
+                The Goal Time Capsule
               </span>
             </div>
 
