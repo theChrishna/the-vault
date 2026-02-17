@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google"; // Import the fonts
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { FloatingFeedbackButton } from "@/components/floating-feedback-button";
 
 // Configure the fonts
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -30,6 +31,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <FloatingFeedbackButton />
         </ThemeProvider>
       </body>
     </html>
